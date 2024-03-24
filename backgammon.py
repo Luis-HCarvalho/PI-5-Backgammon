@@ -15,10 +15,10 @@ class Backgammon(Game):
     def initial_board(self):
         board = [
             (0, 0)                                                              # 0: bar (whites, blacks)
-            (2, Checkers.WHITE), None, None, None, None, (5, Checkers.BLACK),   # 1-6
-            None, (3, Checkers.BLACK), None, None, None, (5, Checkers.WHITE),   # 7-12
-            (5, Checkers.BLACK), None, None, None, (3, Checkers.WHITE), None,   # 13-18
-            (5, Checkers.WHITE), None, None, None, None, (2, Checkers.BLACK),   # 19-24
+            (2, Checkers.WHITE), None, None, None, None, (5, Checkers.BLACK),   # 1-6: Black's home board
+            None, (3, Checkers.BLACK), None, None, None, (5, Checkers.WHITE),   # 7-12: Outer Board
+            (5, Checkers.BLACK), None, None, None, (3, Checkers.WHITE), None,   # 13-18: Outer Board
+            (5, Checkers.WHITE), None, None, None, None, (2, Checkers.BLACK),   # 19-24: White's home board
             (0, 0)                                                              # 25: bear off (whites, blacks)
         ]
         return board
