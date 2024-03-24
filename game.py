@@ -12,7 +12,7 @@ class Game():
     def valid_moves(self):
         pass
 
-    def won(self):
+    def won(self, checkers_color):
         pass
 
     def draw(self):
