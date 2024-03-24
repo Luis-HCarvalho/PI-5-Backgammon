@@ -33,8 +33,8 @@ class Backgammon(Game):
         return (Checkers.WHITE if dices[0] > dices[1] else Checkers.BLACK)
     
     #
-    def turn(self):
-        return self._turn
+    def turn(self, next=False):
+        return (self._turn ^ 1 if next else self._turn)
     
     #
     def won(self, checkers_color):

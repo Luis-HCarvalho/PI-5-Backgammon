@@ -3,7 +3,7 @@ class Player:
         raise NotImplementedError("Must be implemented")
 
 class Game():
-    def turn(self):
+    def turn(self, next):
         pass
 
     def play(self, localizacao):
