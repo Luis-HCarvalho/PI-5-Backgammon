@@ -7,9 +7,9 @@ class Checkers(Enum):
     BLACK = 1
 
 class Backgammon(Game):
-    def __init__(self):
-        self._turn = self.first_turn()
-        self.board = self.initial_board()
+    def __init__(self, board = None, turn = None):
+        self._turn = (self.first_turn() if turn is None else turn)
+        self.board = (self.initial_board() if board is None else board)
 
     # generate initial state of the board
     def initial_board(self):
