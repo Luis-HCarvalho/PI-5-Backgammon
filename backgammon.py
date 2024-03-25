@@ -14,7 +14,7 @@ class Backgammon(Game):
     # generate initial state of the board
     def initial_board(self):
         board = [
-            (0, 0)                                                              # 0: bar (whites, blacks)
+            (0, 0),                                                              # 0: bar (whites, blacks)
             (2, Checkers.WHITE), None, None, None, None, (5, Checkers.BLACK),   # 1-6: Black's home board
             None, (3, Checkers.BLACK), None, None, None, (5, Checkers.WHITE),   # 7-12: Outer Board
             (5, Checkers.BLACK), None, None, None, (3, Checkers.WHITE), None,   # 13-18: Outer Board
