@@ -47,3 +47,35 @@ class Backgammon(Game):
     def play(self, new_board_state):
         return Backgammon(new_board_state, self.turn(True))
     
+    #
+    def valid_moves(self, dices, checkers_color):
+        def possible_moves(dices, checkers_color, last_move, moves):
+            if len(dices) == 0:
+                return moves
+            
+            for i in range(1, 24):
+                if (last_move[i] != None and last_move[i][1] == checkers_color):
+                    move = last_move.copy()
+                    for i, d in enumerate(dices):
+                        if last_move[d + i] > 24:
+                            move[25][checkers_color] += 1
+                        elif last_move[d + i] is None or last_move[d + i][0] <= 1:
+                            move[d + i] = (1, checkers_color)
+                        elif last_move[d + i][1] == checkers_color:                 
+                            move[d + i][0] += 1
+                        else:
+                            continue
+
+                        if move[i][0] == 1:
+                            move[i] = None
+                        else:
+                            move[i][0] -= 1
+
+                        moves.insert(move)
+                        dices.pop(0)
+                        tmp = possible_moves(dices, checkers_color, move, moves)
+                        moves = [*moves, *tmp]
+            
+            return moves
+        
+        return possible_moves(dices, checkers_color, self.board.copy(), [])
