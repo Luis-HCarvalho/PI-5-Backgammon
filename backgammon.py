@@ -42,4 +42,8 @@ class Backgammon(Game):
             return (self.board[25][0] == 15)
         else:
             return (self.board[25][1] == 15)
-        
+    
+    #
+    def play(self, new_board_state):
+        return Backgammon(new_board_state, self.turn(True))
+    
