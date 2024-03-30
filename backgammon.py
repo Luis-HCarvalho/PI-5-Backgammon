@@ -185,7 +185,7 @@ class Backgammon(Game):
             index = (i + 19 if checkers_color == Checkers.WHITE else i)
             if index == 0 or index == 25:
                 count += board[25][1]
-            elif board[index][1] == checkers_color:
+            elif board[index] != None and board[index][1] == checkers_color:
                 count += board[index][0]
         
         return (count == 15)
