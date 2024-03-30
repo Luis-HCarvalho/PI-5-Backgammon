@@ -50,6 +50,39 @@ class Backgammon(Game):
         else:
             return (self.board[25][1] == 15)
 
+    # evaluate based on distance of bear off (enemy - player)
+    def evaluate(self, player):
+        if self.won(player):
+            return float("+inf")
+        elif self.won(player.oposit()):
+            return float("-inf")
+
+        # value = pip black - pip white
+        value = 0.0    
+        for position in range(1, self.board_number_of_positions + 1):
+            board_pos = self.board[position]
+            if board_pos is not None:
+                distance_multiplier = 1
+
+                if player == board_pos[1]:
+                    distance_multiplier = self.board_number_of_positions - position + 1
+                else:
+                    distance_multiplier = position
+
+                if board_pos[1] == player:
+                    value -= board_pos[0] * distance_multiplier
+                else:
+                    value += board_pos[0] * distance_multiplier
+
+        if player == Checkers.WHITE:
+            value -= self.board[0][1] * 24
+            value += self.board[0][0] * 24
+        else:
+            value -= self.board[1][0] * 24
+            value += self.board[1][1] * 24
+        
+        return value
+
     # organize visual presentation of each quadrant   
     def quadrant_checkers_positions(self, total_of_quadrant_columns, total_of_rows, start, end):
         quadrant_positions = [" 🟦 |"] * (total_of_quadrant_columns * total_of_rows)
