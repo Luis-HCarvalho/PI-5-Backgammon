@@ -69,6 +69,11 @@ class Backgammon(Game):
                     # checks if the new position no longer contains more than one piece from the enemy team
                     if not (self.board[new_position] != None and self.board[new_position][1] != checker and self.board[new_position][0] > 1):
                         valid_moves.append((position, new_position))
+                        
+                # if all pieces are already in your last quadrant, you can start scoring off the board
+                elif (new_position == 0 or new_position == self.board_number_of_positions + 1):
+                    if self._bearoff_available(self.board, checker):
+                        valid_moves.append(new_position)
 
         return valid_moves
     
