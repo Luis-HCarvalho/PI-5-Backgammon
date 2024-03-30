@@ -1,10 +1,14 @@
 from enum import Enum
-from game import Game
+from game import Game, Player
 import random
 
-class Checkers(Enum):
+class Checkers(Player, Enum):
     WHITE = 0
     BLACK = 1
+
+    # get opposite checker
+    def opposite(self):
+        return Checkers.BLACK if self == Checkers.WHITE else Checkers.WHITE
 
 class Backgammon(Game):
     def __init__(self, board = None, turn = None):
@@ -27,7 +31,8 @@ class Backgammon(Game):
     
     # returns a tuple with two pseudo random d6 values
     def dices(self):
-        return (random.randint(1, 6), random.randint(1, 6))
+        dices = [random.randint(1, 6), random.randint(1, 6)]
+        return dices if dices[0] != dices[1] else [dices[0]] * 4
 
     #
     def first_turn(self):
@@ -36,7 +41,7 @@ class Backgammon(Game):
     
     #
     def turn(self, next=False):
-        return (self._turn ^ 1 if next else self._turn)
+        return (self._turn.opposite() if next else self._turn)
 
     # according to which player and array of values ​​to be moved, an array of movement possibilities is returned [origin of the piece, destination of the piece]
     def valid_move(self, checker, movements):
@@ -173,3 +178,14 @@ class Backgammon(Game):
 
         return final_state
     
+    # evaluate if bering off checkers is available
+    def _bearoff_available(self, board, checkers_color):
+        count = 0
+        for i in range(0, 7):
+            index = (i + 19 if checkers_color == Checkers.WHITE else i)
+            if index == 0 or index == 25:
+                count += board[25][1]
+            elif board[index][1] == checkers_color:
+                count += board[index][0]
+        
+        return (count == 15)
