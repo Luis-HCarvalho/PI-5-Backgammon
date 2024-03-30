@@ -37,6 +37,30 @@ class Backgammon(Game):
     #
     def turn(self, next=False):
         return (self._turn ^ 1 if next else self._turn)
+
+    # according to which player and array of values ​​to be moved, an array of movement possibilities is returned [origin of the piece, destination of the piece]
+    def valid_move(self, checker, movements):
+        valid_moves = []
+        current_positions = []
+
+        for i in range(self.board_number_of_positions):
+            position = i + 1
+
+            if self.board[position] != None and self.board[position][1] == checker:
+                current_positions.append(position)
+
+        for position in current_positions:
+            for movement in movements:
+                if (checker == Checkers.WHITE):
+                    new_position = position + movement
+                else:
+                    new_position = position - movement
+
+                if (new_position >= 1 and new_position <= self.board_number_of_positions):
+                    if not (self.board[new_position] != None and self.board[new_position][1] != checker and self.board[new_position][0] > 1):
+                        valid_moves.append((position, new_position))
+
+        return valid_moves
     
     #
     def won(self, checkers_color):
