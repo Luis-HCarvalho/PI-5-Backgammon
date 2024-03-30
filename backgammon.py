@@ -144,3 +144,14 @@ class Backgammon(Game):
 
         return final_state
     
+    # evaluate if bering off checkers is available
+    def _bearoff_available(self, board, checkers_color):
+        count = 0
+        for i in range(0, 7):
+            index = (i + 19 if checkers_color == Checkers.WHITE else i)
+            if index == 0 or index == 25:
+                count += board[25][1]
+            elif board[index][1] == checkers_color:
+                count += board[index][0]
+        
+        return (count == 15)
