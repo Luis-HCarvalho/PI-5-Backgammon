@@ -54,7 +54,7 @@ class Backgammon(Game):
     def evaluate(self, player):
         if self.won(player):
             return float("+inf")
-        elif self.won(player.oposit()):
+        elif self.won(player.opposite()):
             return float("-inf")
 
         # value = pip black - pip white
