@@ -43,20 +43,25 @@ class Backgammon(Game):
         valid_moves = []
         current_positions = []
 
+        # possibilities of parts to be moved (origin)
         for i in range(self.board_number_of_positions):
             position = i + 1
 
             if self.board[position] != None and self.board[position][1] == checker:
                 current_positions.append(position)
 
+        # for each origin position, according to the dices number, what are the possible destination positions
         for position in current_positions:
             for movement in movements:
+                # depending on the checker to be moved, the direction on the board is different
                 if (checker == Checkers.WHITE):
                     new_position = position + movement
                 else:
                     new_position = position - movement
 
+                # checks if the position is within the board
                 if (new_position >= 1 and new_position <= self.board_number_of_positions):
+                    # checks if the new position no longer contains more than one piece from the enemy team
                     if not (self.board[new_position] != None and self.board[new_position][1] != checker and self.board[new_position][0] > 1):
                         valid_moves.append((position, new_position))
 

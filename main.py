@@ -7,5 +7,6 @@ def human_turn(backgammon):
 if __name__ == "__main__":
     backgammon_board = Backgammon()
     print(backgammon_board)
+    print(backgammon_board)
 
-    print(backgammon_board.valid_move(Checkers.BLACK, [1, 3]))
+    print(backgammon_board.valid_move(Checkers.BLACK, (1, 3)))
