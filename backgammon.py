@@ -193,3 +193,45 @@ class Backgammon(Game):
                 count += board[index][0]
         
         return (count == 15)
+    
+    # receives respectively as params a boolean value ("dices_left") that 
+    # determine if the turn should end; and an array of two elements 
+    # ("movement") with the positions of origin and destination of the movement.
+    # 
+    # This method create a new state (i.e. instance of the class Backgammon())
+    # based on the data received as params. Then, return it.
+    # 
+    # Obs.: is expected that all data passed as param to this method follows 
+    # properly the rules of the game. So some checks and validations are 
+    # omitted
+    def play(self, dices_left, movement):
+        board = self.board[:]
+        origin = movement[0]
+        destination = movement[1]
+
+        if (origin == 0):
+            if (self.turn() == Checkers.WHITE):
+                board[origin] = (board[origin][0] - 1, board[origin][1])
+            else:
+                board[origin] = (board[origin][0], board[origin][1] - 1)
+        elif (board[origin][0] == 1):
+                board[origin] = None
+        else:   # origin position has more than one checker
+            board[origin] = (board[origin][0] - 1, board[origin][1])
+        
+        if (destination == 25):
+            if (self.turn() == Checkers.WHITE):
+                board[25] = (board[25][0] + 1, board[25][1])
+            else:
+                board[25] = (board[25][0], board[25][1] + 1)
+        elif (board[destination] == None):
+            board[destination] = (1, self.turn())
+        else:   # destination position has one enemy checker
+            board[destination] = (1, self.turn())
+            if (self.turn() == Checkers.WHITE):
+                board[0] = (board[0][0], board[0][1] + 1)
+            else:
+                board[0] = (board[0][0] + 1, board[0][1])
+
+        turn = (self.turn() if dices_left else self.turn(next=True))
+        return Backgammon(board, turn)
