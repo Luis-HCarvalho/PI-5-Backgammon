@@ -41,7 +41,7 @@ class Backgammon(Game):
     
     #
     def turn(self, next=False):
-        return (self._turn.opposite() if next else self._turn)
+        return self._turn.opposite() if next else self._turn
     
     #
     def won(self):

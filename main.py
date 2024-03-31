@@ -1,4 +1,5 @@
 from backgammon import Backgammon, Checkers
+from minimax import best_move_agent_poda, first_moves
 
 class Human():
     def __init__(self, checker):
@@ -34,11 +35,54 @@ class Human():
 
         return moves
 
+class MiniMax():
+    def __init__(self, checker):
+        self.checker = checker
+    
+    def turn(self, backgammon):
+        dices = backgammon.dices()
+        print(dices)
+        while len(dices) >= 1:
+            move = best_move_agent_poda(backgammon, dices, 6)
+            
+            used_dice = abs(move[1] - move[0])
+            
+            if used_dice == 24:
+                used_dice = 24 - used_dice + 1
+
+            dices.remove(used_dice)
+            backgammon = backgammon.play(len(dices) > 0, move)
+        
+        return backgammon
+    
+    def first_turn(self, backgammon):
+        dices = backgammon.dices()
+        print(dices)
+        
+        return first_moves(backgammon, dices, self.checker)
 
 if __name__ == "__main__":
     backgammon_board = Backgammon()
     human = Human(Checkers.WHITE)
-    print(backgammon_board)
-    print(human.turn(backgammon_board))
+    minimax = MiniMax(Checkers.BLACK)
+    
+    turno = 1
+    while not backgammon_board.won():
+        print(backgammon_board)
+        turn_player = backgammon_board.turn()
+        if backgammon_board.turn() == human.checker:
+            moves = human.turn(backgammon_board)
+            for i in range(len(moves) - 1):
+                backgammon_board = backgammon_board.play(True, moves[i])
+            
+            backgammon_board = backgammon_board.play(False, moves[-1])
+        elif turno == 1:
+            backgammon_board = minimax.first_turn(backgammon_board)
+        else:
+            backgammon_board = minimax.turn(backgammon_board)
+
+        if turn_player != backgammon_board.turn():
+            turno += 1
+        
 
     # print(backgammon_board.valid_moves(Checkers.BLACK, (5, 6)))

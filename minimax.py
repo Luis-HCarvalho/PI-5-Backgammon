@@ -38,11 +38,7 @@ def minimax_alfabeta(game, player, rolled_dices, maximum_depth = 3, alfa = float
                 
                 dices_copy.remove(used_dice)
                 new_game = game.play(len(dices_copy) > 0, next_game)
-                evaluate = 0
-                if new_game.turn() == player:
-                    evaluate = minimax_alfabeta(new_game, player, dices_copy, maximum_depth, alfa, beta)
-                else:
-                    evaluate = minimax_alfabeta(new_game, player, dices_copy, maximum_depth - 1, alfa, beta)
+                evaluate = evaluate = minimax_alfabeta(new_game, player, dices_copy, maximum_depth - 1, alfa, beta)
                 alfa = max(evaluate, alfa)
                 if beta <= alfa:
                     continue
@@ -58,11 +54,7 @@ def minimax_alfabeta(game, player, rolled_dices, maximum_depth = 3, alfa = float
                 
                 dices_copy.remove(used_dice)
                 new_game = game.play(len(dices_copy) > 0, next_game)
-                evaluate = 0
-                if new_game.turn() != player:
-                    evaluate = minimax_alfabeta(new_game, player, dices_copy, maximum_depth, alfa, beta)
-                else:
-                    evaluate = minimax_alfabeta(new_game, player, dices_copy, maximum_depth - 1, alfa, beta)
+                evaluate = minimax_alfabeta(new_game, player, dices_copy, maximum_depth - 1, alfa, beta)
                 beta = min(evaluate, beta)
                 if beta <= alfa:
                     continue
@@ -88,6 +80,7 @@ def best_move_agent_poda(game, dices, maximum_depth = 3):
         if used_dice == 24:
             used_dice = 24 - used_dice + 1
         
+        print(dices_copy, used_dice)
         dices_copy.remove(used_dice)
         new_game = game.play(len(dices_copy) > 0, next_game)
         evaluate = minimax_alfabeta(new_game, game.turn(), dices_copy, maximum_depth)
@@ -96,9 +89,8 @@ def best_move_agent_poda(game, dices, maximum_depth = 3):
             best_move = next_game
     return best_move
 
-def first_move(game, player):
-    dices = game.dices()
-    print(dices)
+def first_moves(game, dices, player):
+
     next_game = game
     match(dices):
         case [1, 2] | [2, 1]:
@@ -171,7 +163,7 @@ if __name__ == "__main__":
     game = Backgammon()
     print(game)
     print(game.evaluate(game.turn()))
-    #print(first_move(game, game.turn))
     dices = game.dices()
     print(dices)
-    print(best_move_agent_poda(game, dices, 3))
+    #print(first_move(game, dices, game.turn))
+    print(best_move_agent_poda(game, dices, 8))
