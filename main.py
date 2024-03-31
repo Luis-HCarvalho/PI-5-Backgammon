@@ -30,6 +30,8 @@ class Human():
                 else:
                     current_move = (position, position - dice)
 
+            backgammon = backgammon.play(len(dices) > 0, current_move)
+
             dices.remove(dice)
             moves.append(current_move)
 
