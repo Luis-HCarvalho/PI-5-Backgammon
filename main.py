@@ -8,19 +8,19 @@ class Human():
     def turn(self, backgammon):
         dices = backgammon.dices()
 
-        print("Valores dos dados: ")
-        for dice in dices:
-            print(dice)
-
         turns = range(len(dices))
 
         moves = []
         for turn in turns: 
             current_move = (-1, -1)
-            print(backgammon.valid_moves(self.checker, dices))
+            # print(backgammon.valid_moves(self.checker, dices))
 
             while current_move not in backgammon.valid_moves(self.checker, dices):
-                print(f"{turn + 1}º Jogada do humano")
+                print("\nValores dos dados: ")
+                for dice in dices:
+                    print(dice)
+
+                print(f"\n{turn + 1}º Jogada do humano")
 
                 position = int(input("Posição da peça a ser movida: "))
                 dice = int(input("Valor do dado para movimentação: "))
@@ -30,12 +30,12 @@ class Human():
                 else:
                     current_move = (position, position - dice)
 
-            backgammon = backgammon.play(len(dices) > 0, current_move)
-
             dices.remove(dice)
+            backgammon = backgammon.play(len(dices) > 0, current_move)
             moves.append(current_move)
+            print(backgammon)
 
-        return moves
+        return backgammon
 
 class MiniMax():
     def __init__(self, checker):
@@ -68,16 +68,21 @@ if __name__ == "__main__":
     human = Human(Checkers.WHITE)
     minimax = MiniMax(Checkers.BLACK)
     
+    print("\n== GAMÃO ==\n")
+    if (human.checker == Checkers.WHITE):
+        print("Humano ⚪")
+        print("Computador ⚫")
+    else:
+        print("Humano ⚫")
+        print("Computador ⚪")
+
     turno = 1
     while not backgammon_board.won():
         print(backgammon_board)
         turn_player = backgammon_board.turn()
         if backgammon_board.turn() == human.checker:
-            moves = human.turn(backgammon_board)
-            for i in range(len(moves) - 1):
-                backgammon_board = backgammon_board.play(True, moves[i])
-            
-            backgammon_board = backgammon_board.play(False, moves[-1])
+            backgammon_board = human.turn(backgammon_board)        
+            # backgammon_board = backgammon_board.play(False, human.moves[-1])
         elif turno == 1:
             backgammon_board = minimax.first_turn(backgammon_board)
         else:
