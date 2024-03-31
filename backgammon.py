@@ -44,18 +44,13 @@ class Backgammon(Game):
         return (self._turn.opposite() if next else self._turn)
     
     #
-    def won(self, checkers_color):
-        if checkers_color == Checkers.WHITE:
-            return (self.board[25][0] == 15)
-        else:
-            return (self.board[25][1] == 15)
+    def won(self):
+        return (self.board[25][0] == 15) or (self.board[25][1] == 15)
 
     # evaluate based on distance of bear off (enemy - player)
     def evaluate(self, player):
-        if self.won(player):
-            return float("+inf")
-        elif self.won(player.opposite()):
-            return float("-inf")
+        if self.won():
+            return float("+inf") if self.turn() == player else float("-inf")
 
         # value = pip black - pip white
         value = 0.0    
@@ -78,8 +73,8 @@ class Backgammon(Game):
             value -= self.board[0][1] * 24
             value += self.board[0][0] * 24
         else:
-            value -= self.board[1][0] * 24
-            value += self.board[1][1] * 24
+            value -= self.board[0][0] * 24
+            value += self.board[0][1] * 24
         
         return value
 
