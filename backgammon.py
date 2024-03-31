@@ -50,6 +50,39 @@ class Backgammon(Game):
         else:
             return (self.board[25][1] == 15)
 
+    # evaluate based on distance of bear off (enemy - player)
+    def evaluate(self, player):
+        if self.won(player):
+            return float("+inf")
+        elif self.won(player.opposite()):
+            return float("-inf")
+
+        # value = pip black - pip white
+        value = 0.0    
+        for position in range(1, self.board_number_of_positions + 1):
+            board_pos = self.board[position]
+            if board_pos is not None:
+                distance_multiplier = 1
+
+                if player == board_pos[1]:
+                    distance_multiplier = self.board_number_of_positions - position + 1
+                else:
+                    distance_multiplier = position
+
+                if board_pos[1] == player:
+                    value -= board_pos[0] * distance_multiplier
+                else:
+                    value += board_pos[0] * distance_multiplier
+
+        if player == Checkers.WHITE:
+            value -= self.board[0][1] * 24
+            value += self.board[0][0] * 24
+        else:
+            value -= self.board[1][0] * 24
+            value += self.board[1][1] * 24
+        
+        return value
+
     # according to which player and array of values ​​to be moved, an array of movement possibilities is returned [origin of the piece, destination of the piece]
     def valid_moves(self, checker, movements):
         valid_moves = []  
@@ -239,7 +272,8 @@ class Backgammon(Game):
 
 
         # construct the final state string with proper formatting
-        final_state += "\n\n||============================================================||\n"
+        final_state += "\n\n|| 13 | 14 | 15 | 16 | 17 | 18 || 19 | 20 | 21 | 22 | 23 | 24 ||\n"
+        final_state += "||============================================================||\n"
 
         for position in range(total_of_positions_top):
             if (position % (2 * total_of_quadrant_columns) == 0):
@@ -265,11 +299,55 @@ class Backgammon(Game):
             if ((position + 1) % (2 * total_of_quadrant_columns) == 0 and position !=0):
                 final_state += "|\n"
 
-        final_state += "||============================================================||\n\n"
+        final_state += "||============================================================||\n"
+        final_state += "|| 12 | 11 | 10 | 09 | 08 | 07 || 06 | 05 | 04 | 03 | 02 | 01 ||\n\n"
 
-        final_state += f"Peças tomadas [ ⚪ : {self.board[0][0]} ] [ ⚫ : {self.board[0][1]} ]\n\n"
+        final_state += f"Peças tomadas   [ ⚪ : {self.board[0][0]} ] [ ⚫ : {self.board[0][1]} ]\n\n"
 
         final_state += f"Peças pontuadas [ ⚪ : {self.board[25][0]} ] [ ⚫ : {self.board[25][1]} ]\n\n"
 
         return final_state
     
+    # receives respectively as params a boolean value ("dices_left") that 
+    # determine if the turn should end; and an array of two elements 
+    # ("movement") with the positions of origin and destination of the movement.
+    # 
+    # This method create a new state (i.e. instance of the class Backgammon())
+    # based on the data received as params. Then, return it.
+    # 
+    # Obs.: is expected that all data passed as param to this method follows 
+    # properly the rules of the game. So some checks and validations are 
+    # omitted
+    def play(self, dices_left, movement):
+        board = self.board[:]
+        origin = movement[0]
+        destination = movement[1]
+
+        if (origin == 0):
+            if (self.turn() == Checkers.WHITE):
+                board[origin] = (board[origin][0] - 1, board[origin][1])
+            else:
+                board[origin] = (board[origin][0], board[origin][1] - 1)
+        elif (board[origin][0] == 1):
+                board[origin] = None
+        else:   # origin position has more than one checker
+            board[origin] = (board[origin][0] - 1, board[origin][1])
+        
+        if (destination == 25):
+            if (self.turn() == Checkers.WHITE):
+                board[25] = (board[25][0] + 1, board[25][1])
+            else:
+                board[25] = (board[25][0], board[25][1] + 1)
+        elif (board[destination] == None):
+            board[destination] = (1, self.turn())
+        elif (board[destination][1] == self.turn()):
+            board[destination] = (board[destination][0] + 1, self.turn())
+        else:   # destination position has one enemy checker
+            board[destination] = (1, self.turn())
+            if (self.turn() == Checkers.WHITE):
+                board[0] = (board[0][0], board[0][1] + 1)
+            else:
+                board[0] = (board[0][0] + 1, board[0][1])
+
+        turn = (self.turn() if dices_left else self.turn(next=True))
+        return Backgammon(board, turn)
