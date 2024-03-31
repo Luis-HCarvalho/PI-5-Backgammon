@@ -139,8 +139,7 @@ class Backgammon(Game):
         moves_with_score = []
         moves_out_range = []
         current_positions = self._current_checkers_positions(checker)
-
-        
+    
         for movement in movements:
             for position in current_positions:
                 # depending on the checker to be moved, the direction on the board is different
