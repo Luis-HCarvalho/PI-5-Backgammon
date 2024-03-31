@@ -148,7 +148,8 @@ class Backgammon(Game):
 
 
         # construct the final state string with proper formatting
-        final_state += "\n\n||============================================================||\n"
+        final_state += "\n\n|| 13 | 14 | 15 | 16 | 17 | 18 || 19 | 20 | 21 | 22 | 23 | 24 ||\n"
+        final_state += "||============================================================||\n"
 
         for position in range(total_of_positions_top):
             if (position % (2 * total_of_quadrant_columns) == 0):
@@ -174,9 +175,10 @@ class Backgammon(Game):
             if ((position + 1) % (2 * total_of_quadrant_columns) == 0 and position !=0):
                 final_state += "|\n"
 
-        final_state += "||============================================================||\n\n"
+        final_state += "||============================================================||\n"
+        final_state += "|| 12 | 11 | 10 | 09 | 08 | 07 || 06 | 05 | 04 | 03 | 02 | 01 ||\n\n"
 
-        final_state += f"Peças tomadas [ ⚪ : {self.board[0][0]} ] [ ⚫ : {self.board[0][1]} ]\n\n"
+        final_state += f"Peças tomadas   [ ⚪ : {self.board[0][0]} ] [ ⚫ : {self.board[0][1]} ]\n\n"
 
         final_state += f"Peças pontuadas [ ⚪ : {self.board[25][0]} ] [ ⚫ : {self.board[25][1]} ]\n\n"
 
