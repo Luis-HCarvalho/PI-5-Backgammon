@@ -9,4 +9,4 @@ if __name__ == "__main__":
     print(backgammon_board)
     print(backgammon_board)
 
-    print(backgammon_board.valid_move(Checkers.BLACK, (1, 3)))
+    print(backgammon_board.valid_moves(Checkers.BLACK, (5, 3)))

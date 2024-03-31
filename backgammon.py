@@ -42,20 +42,51 @@ class Backgammon(Game):
     #
     def turn(self, next=False):
         return (self._turn.opposite() if next else self._turn)
+    
+    #
+    def won(self, checkers_color):
+        if checkers_color == Checkers.WHITE:
+            return (self.board[25][0] == 15)
+        else:
+            return (self.board[25][1] == 15)
 
     # according to which player and array of values ​​to be moved, an array of movement possibilities is returned [origin of the piece, destination of the piece]
-    def valid_move(self, checker, movements):
-        valid_moves = []
-        current_positions = []
+    def valid_moves(self, checker, movements):
+        valid_moves = []  
 
-        # possibilities of parts to be moved (origin)
-        for i in range(self.board_number_of_positions):
-            position = i + 1
+        if (self.board[0][checker.value]):
+            valid_moves = self._valid_moves_from_bar(checker, movements)
 
-            if self.board[position] != None and self.board[position][1] == checker:
-                current_positions.append(position)
+        elif (self._bearoff_available(self.board, checker)):
+            valid_moves = self._valid_moves_during_bearoff(checker, movements)
 
-        # for each origin position, according to the dices number, what are the possible destination positions
+        else:
+            valid_moves = self._valid_moves_across_board(checker, movements)        
+
+        return valid_moves
+    
+    #
+    def _valid_moves_from_bar(self, checker, movements):
+        moves = []
+
+        for movement in movements:
+            if (checker == Checkers.WHITE):
+                position = 0 
+                new_position = position + movement
+            else:
+                position = 25
+                new_position = position - movement
+
+            if (self._available_position(checker, new_position)):
+                moves.append((0, new_position))
+
+        return moves
+    
+    # for each origin position, according to the dices number, what are the possible destination positions
+    def _valid_moves_across_board(self, checker, movements):
+        moves = []
+        current_positions = self._current_checkers_positions(checker)
+
         for position in current_positions:
             for movement in movements:
                 # depending on the checker to be moved, the direction on the board is different
@@ -64,25 +95,80 @@ class Backgammon(Game):
                 else:
                     new_position = position - movement
 
-                # checks if the position is within the board
-                if (new_position >= 1 and new_position <= self.board_number_of_positions):
-                    # checks if the new position no longer contains more than one piece from the enemy team
-                    if not (self.board[new_position] != None and self.board[new_position][1] != checker and self.board[new_position][0] > 1):
-                        valid_moves.append((position, new_position))
-                        
-                # if all pieces are already in your last quadrant, you can start scoring off the board
-                elif (new_position == 0 or new_position == self.board_number_of_positions + 1):
-                    if self._bearoff_available(self.board, checker):
-                        valid_moves.append(new_position)
-
-        return valid_moves
+                if(self._available_position(checker, new_position)):
+                    moves.append((position, new_position))
+        
+        return moves
     
     #
-    def won(self, checkers_color):
-        if checkers_color == Checkers.WHITE:
-            return (self.board[25][0] == 15)
-        else:
-            return (self.board[25][1] == 15)
+    def _valid_moves_during_bearoff(self, checker, movements):
+        moves = []
+        moves_with_score = []
+        moves_out_range = []
+        current_positions = self._current_checkers_positions(checker)
+
+        for position in current_positions:
+            for movement in movements:
+                # depending on the checker to be moved, the direction on the board is different
+                if (checker == Checkers.WHITE):
+                    new_position = position + movement
+                    if (new_position == self.board_number_of_positions + 1):
+                        moves_with_score.append((position, 25))
+                        moves.append((position, 25))
+                    elif (new_position < self.board_number_of_positions + 1):
+                        moves.append((position, new_position))
+                    else:
+                        moves_out_range.append(position)
+                else:
+                    new_position = position - movement
+                    if (new_position == 0):
+                        moves_with_score.append((position, 25))
+                        moves.append((position, 25))
+                    elif (new_position > 0):
+                        moves.append((position, new_position))
+                    else:
+                        moves_out_range.append(position)
+
+        if (moves_with_score == [] and moves_out_range != []):
+            if (checker == Checkers.WHITE):
+                moves.append((min(moves_out_range), 25))
+            else:
+                moves.append((max(moves_out_range), 25))
+
+        return moves
+    
+    # possibilities of parts to be moved according to the checker (origin)
+    def _current_checkers_positions(self, checker):
+        positions = []
+
+        for i in range(self.board_number_of_positions):
+            position = i + 1
+
+            if self.board[position] != None and self.board[position][1] == checker:
+                positions.append(position)
+
+        return positions
+
+    # checks if the position is within the board and available within the rules 
+    def _available_position(self, checker, position):
+        if (position >= 1 and position <= self.board_number_of_positions):
+            # checks if the new position no longer contains more than one piece from the enemy team
+            if not (self.board[position] != None and self.board[position][1] != checker and self.board[position][0] > 1):
+                return True
+        
+        return False
+    
+    # evaluate if bering off checkers is available
+    def _bearoff_available(self, board, checkers_color):
+        count = 0
+        for i in range(0, 7):
+            index = (i + 19 if checkers_color == Checkers.WHITE else i)
+            if index == 0 or index == 25:
+                count += board[25][1]
+            elif board[index] != None and board[index][1] == checkers_color:
+                count += board[index][0]
+        
+        return (count == 15)
 
     # organize visual presentation of each quadrant   
     def quadrant_checkers_positions(self, total_of_quadrant_columns, total_of_rows, start, end):
@@ -183,14 +269,3 @@ class Backgammon(Game):
 
         return final_state
     
-    # evaluate if bering off checkers is available
-    def _bearoff_available(self, board, checkers_color):
-        count = 0
-        for i in range(0, 7):
-            index = (i + 19 if checkers_color == Checkers.WHITE else i)
-            if index == 0 or index == 25:
-                count += board[25][1]
-            elif board[index] != None and board[index][1] == checkers_color:
-                count += board[index][0]
-        
-        return (count == 15)
