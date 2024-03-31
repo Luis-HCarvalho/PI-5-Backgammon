@@ -226,6 +226,8 @@ class Backgammon(Game):
                 board[25] = (board[25][0], board[25][1] + 1)
         elif (board[destination] == None):
             board[destination] = (1, self.turn())
+        elif (board[destination][1] == self.turn()):
+            board[destination] = (board[destination][0] + 1, self.turn())
         else:   # destination position has one enemy checker
             board[destination] = (1, self.turn())
             if (self.turn() == Checkers.WHITE):
