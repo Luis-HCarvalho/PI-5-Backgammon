@@ -65,7 +65,7 @@ class Backgammon(Game):
 
         return valid_moves
     
-    #
+    # possible movements of the captured checker starting from the initial quadrant
     def _valid_moves_from_bar(self, checker, movements):
         moves = []
 
@@ -100,15 +100,16 @@ class Backgammon(Game):
         
         return moves
     
-    #
+    # possible moves considering final position rules
     def _valid_moves_during_bearoff(self, checker, movements):
         moves = []
         moves_with_score = []
         moves_out_range = []
         current_positions = self._current_checkers_positions(checker)
 
-        for position in current_positions:
-            for movement in movements:
+        
+        for movement in movements:
+            for position in current_positions:
                 # depending on the checker to be moved, the direction on the board is different
                 if (checker == Checkers.WHITE):
                     new_position = position + movement
@@ -129,11 +130,14 @@ class Backgammon(Game):
                     else:
                         moves_out_range.append(position)
 
-        if (moves_with_score == [] and moves_out_range != []):
-            if (checker == Checkers.WHITE):
-                moves.append((min(moves_out_range), 25))
-            else:
-                moves.append((max(moves_out_range), 25))
+            if (moves_with_score == [] and moves_out_range != []):
+                if (checker == Checkers.WHITE):
+                    moves.append((min(moves_out_range), 25))
+                else:
+                    moves.append((max(moves_out_range), 25))
+            
+            moves_out_range = []
+            moves_with_score = [] 
 
         return moves
     
