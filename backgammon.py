@@ -105,8 +105,7 @@ class Backgammon(Game):
                 position = 25
                 new_position = position - movement
 
-            if (self._available_position(checker, new_position)):
-                moves.append((0, new_position))
+            moves.append((0, new_position))
 
         return moves
     
