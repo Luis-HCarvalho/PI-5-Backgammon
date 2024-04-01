@@ -13,10 +13,15 @@ class Checkers(Player, Enum):
 class Backgammon(Game):
     def __init__(self, board = None, turn = None):
         self.board_number_of_positions = 24
-
-        self._turn = (self.first_turn() if turn is None else turn)
         self.board = (self.initial_board() if board is None else board)
+        self._turn = turn
+        
+    def start(self):
+        turn_and_rolls = self.first_turn()
+        self._turn = turn_and_rolls[0]
+        return turn_and_rolls[1]
 
+        
     # generate initial state of the board
     def initial_board(self):
         board = [
@@ -37,7 +42,9 @@ class Backgammon(Game):
     #
     def first_turn(self):
         dices = self.dices()
-        return (Checkers.WHITE if dices[0] > dices[1] else Checkers.BLACK)
+        while dices[0] == dices[1]:
+            dices = self.dices()
+        return (Checkers.WHITE if dices[0] > dices[1] else Checkers.BLACK, dices)
     
     #
     def turn(self, next=False):
