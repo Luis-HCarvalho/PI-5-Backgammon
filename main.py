@@ -28,8 +28,13 @@ class Human():
 
                     if (self.checker == Checkers.WHITE):
                         current_move = (position, position + dice)
+                        out_board = position + dice > 25
                     else:
                         current_move = (position, position - dice)
+                        out_board = position - dice < 1
+
+                    if out_board:
+                        current_move = (position, 25)
 
                 dices.remove(dice)
                 backgammon = backgammon.play(len(dices) > 0, current_move)

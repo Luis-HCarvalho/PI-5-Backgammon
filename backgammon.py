@@ -193,7 +193,7 @@ class Backgammon(Game):
     def _available_position(self, checker, position):
         if (position >= 1 and position <= self.board_number_of_positions):
             # checks if the new position no longer contains more than one piece from the enemy team
-            if not (self.board[position] != None and self.board[position][1] != checker and self.board[position][0] > 1):
+            if not (self.board[position] != None and (self.board[position][1] != checker and self.board[position][0] > 1)):
                 return True
         
         return False
@@ -204,7 +204,7 @@ class Backgammon(Game):
         for i in range(0, 7):
             index = (i + 19 if checkers_color == Checkers.WHITE else i)
             if index == 0 or index == 25:
-                count += board[25][1]
+                count += board[25][checkers_color.value]
             elif board[index] != None and board[index][1] == checkers_color:
                 count += board[index][0]
         
