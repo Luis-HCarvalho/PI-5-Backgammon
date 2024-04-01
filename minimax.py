@@ -74,11 +74,12 @@ def best_move_agent_poda(game, dices, maximum_depth = 3):
     best_value = float("-inf")
     best_move = [-1, -1]
     for next_game in game.valid_moves(game.turn(), dices):
-        used_dice = abs(next_game[1] - next_game[0])
         dices_copy = list(dices)
         
-        if used_dice == 24:
-            used_dice = 24 - used_dice + 1
+        if (next_game[0] == 0 and next_game[1] >= 19):  # black checkers player moving checkers out of the bar
+            used_dice = abs(next_game[1] - 24) + 1
+        else:
+            used_dice = abs(next_game[1] - next_game[0])
         
         print(dices_copy, used_dice)
         dices_copy.remove(used_dice)
