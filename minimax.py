@@ -29,13 +29,15 @@ def minimax_alfabeta(game, player, rolled_dices, maximum_depth = 3, alfa = float
         dices_combinations = [[x, y] if x != y else [x, y] * 2 for x in range(1, 7) for y in range(x, 7)]
     
     for dices in dices_combinations:
-        # valid_moves.append(game.valid_moves(game.turn(), dices))
-        valid_moves = [*valid_moves, *game.valid_moves(game.turn(), dices)]
+        valid_moves.append(game.valid_moves(game.turn(), dices))
+        # valid_moves = [*valid_moves, *game.valid_moves(game.turn(), dices)]
     
     # print(f"valid_moves: {valid_moves}")
-    for move in valid_moves:
+    for moves in valid_moves:
         # print(f"movement: {move}")
-        new_game = game.play(game.turn(next=True), move)
+        for move in moves:
+            new_game = game.play(game.turn(next=True), move)
+        
         evaluate = minimax_alfabeta(new_game, game.turn(), [], maximum_depth - 1, alfa, beta)
         if (game.turn() == player):
             alfa = max(evaluate, alfa)
@@ -102,6 +104,7 @@ def best_move_agent_poda(game, dices, maximum_depth = 3):
             best_value = evaluate
             best_move = move
     
+    print(f"beat_move: {best_move}")
     return best_move
 
 def first_moves(game, dices, player):
