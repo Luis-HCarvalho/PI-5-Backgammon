@@ -58,13 +58,13 @@ class MiniMax():
         print(dices)
         # print(backgammon.valid_moves(self.checker, dices))
         while len(dices) >= 1:
-            move = best_move_agent_poda(backgammon, dices, 6)
+            move = best_move_agent_poda(backgammon, dices, 4)
          
             if move == [-1, -1]:
                 backgammon = backgammon.skip_turn(backgammon)
                 break
 
-            dice_used = backgammon.dice_used(move)
+            dice_used = backgammon.dice_used(move, dices)
             dices.remove(dice_used)
             backgammon = backgammon.play(len(dices) > 0, move)
         
@@ -106,5 +106,5 @@ if __name__ == "__main__":
         if turn_player != backgammon_board.turn():
             turno += 1
         
-
+    print(f"{backgammon_board.turn()} ganhou!")
     # print(backgammon_board.valid_moves(Checkers.BLACK, (5, 6)))

@@ -66,7 +66,7 @@ class Backgammon(Game):
             if board_pos is not None:
                 distance_multiplier = 1
 
-                if player == board_pos[1]:
+                if board_pos[1] == Checkers.BLACK:
                     distance_multiplier = self.board_number_of_positions - position + 1
                 else:
                     distance_multiplier = position
@@ -77,11 +77,11 @@ class Backgammon(Game):
                     value += board_pos[0] * distance_multiplier
 
         if player == Checkers.WHITE:
-            value -= self.board[0][1] * 24
-            value += self.board[0][0] * 24
+            value -= self.board[0][1] * 25
+            value += self.board[0][0] * 25
         else:
-            value -= self.board[0][0] * 24
-            value += self.board[0][1] * 24
+            value -= self.board[0][0] * 25
+            value += self.board[0][1] * 25
         
         return value
 
@@ -358,9 +358,16 @@ class Backgammon(Game):
     # receives a tuple that corresponds to the moviment made by a checker, 
     # i.e. (origin position, target position), and return the dice value used
     # that make this movement possible
-    def dice_used(self, movement):
+    def dice_used(self, movement, dices):
         if (movement[0] == 0 and movement[1] >= 19):  # black checkers player moving checkers out of the bar
             used_dice = abs(movement[1] - 24) + 1
+        elif (movement[1] == 25):
+            if movement[0] <= 6:
+                used_dice = movement[0]
+            else:
+                used_dice = abs(movement[1] - movement[0])
+            while used_dice not in dices:
+                used_dice += 1
         else:
             used_dice = abs(movement[1] - movement[0])
         

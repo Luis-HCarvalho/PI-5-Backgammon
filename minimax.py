@@ -1,21 +1,50 @@
 from backgammon import Backgammon, Checkers
 
-def minimax(game, max_turn, player, maximum_depth = 8):
+def minimax(game, player, rolled_dices, maximum_depth = 8):
     if game.won() or maximum_depth == 0:
         return game.evaluate(player)
 
-    if max_turn:
-        best_value = float("-inf") 
-        for next_game in game.valid_moves():
-            evaluate = minimax(game.play(next_game), False, player, maximum_depth - 1)
-            best_value = max(evaluate, best_value)
-        return best_value
+    dices_combinations = []
+    if (len(rolled_dices) != 0):
+        dices_combinations.append(rolled_dices)
     else:
-        worst_value = float("inf") 
-        for next_game in game.valid_moves():
-            evaluate = minimax(game.play(next_game), True, player, maximum_depth - 1)
-            worst_value= min(evaluate, worst_value) 
-        return worst_value
+        dices_combinations = [[x, y] if x != y else [x, y] * 2 for x in range(1, 7) for y in range(1, 7)]
+
+    if (game.turn() == player):
+        for dices in dices_combinations:
+            if len(game.valid_moves(game.turn(), dices)) == 0:
+                new_game = game.skip_turn(game)
+                
+                return minimax(new_game, player, [], maximum_depth - 1)
+            
+            best_value = float("-inf")
+            for move in game.valid_moves(game.turn(), dices):
+                dices_copy = list(dices)
+                dice_used = game.dice_used(move, dices_copy)
+                dices_copy.remove(dice_used)
+                new_game = game.play(len(dices_copy) > 0, move)
+
+                evaluate = minimax(new_game, player, dices_copy, maximum_depth - 1)
+                best_value = max(evaluate, best_value)
+                
+            return best_value
+    else:
+        for dices in dices_combinations:
+            if len(game.valid_moves(game.turn(), dices)) == 0:
+                new_game = game.skip_turn(game)
+                
+                return minimax(new_game, player, [], maximum_depth - 1)
+            
+            worst_value = float("inf")
+            for move in game.valid_moves(game.turn(), dices):
+                dices_copy = list(dices)
+                dice_used = game.dice_used(move, dices_copy)
+                dices_copy.remove(dice_used)
+                new_game = game.play(len(dices_copy) > 0, move)
+
+                evaluate = minimax(new_game, player, dices_copy, maximum_depth - 1)
+                worst_value = min(evaluate, worst_value)
+            return worst_value
 
 def minimax_alfabeta(game, player, rolled_dices, maximum_depth = 5, alfa = float("-inf"), beta = float("inf")):
     if game.won() or maximum_depth == 0:
@@ -28,9 +57,21 @@ def minimax_alfabeta(game, player, rolled_dices, maximum_depth = 5, alfa = float
         dices_combinations = [[x, y] if x != y else [x, y] * 2 for x in range(1, 7) for y in range(1, 7)]
 
     for dices in dices_combinations:
+        if len(game.valid_moves(game.turn(), dices)) == 0:
+            new_game = game.skip_turn(game)
+            
+            evaluate = minimax_alfabeta(new_game, player, [], maximum_depth - 1, alfa, beta)
+            if (game.turn() == player):
+                alfa = max(evaluate, alfa)
+            else:
+                beta = min(evaluate, beta)
+            
+            if beta <= alfa:
+                break
+        
         for move in game.valid_moves(game.turn(), dices):
             dices_copy = list(dices)
-            dice_used = game.dice_used(move)
+            dice_used = game.dice_used(move, dices_copy)
             dices_copy.remove(dice_used)
             new_game = game.play(len(dices_copy) > 0, move)
 
@@ -42,17 +83,22 @@ def minimax_alfabeta(game, player, rolled_dices, maximum_depth = 5, alfa = float
             
             if beta <= alfa:
                 break
-
+    
     return (alfa if game.turn() == player else beta)
 
 def best_move_agent(game, dices, maximum_depth = 8):
     best_value = float("-inf")
     best_move = [-1, -1]
-    for next_game in game.valid_moves(dices):
-        evaluate = minimax(game.play(next_game), False, game.turno(), maximum_depth)
+    for move in game.valid_moves(game.turn(), dices):
+        dices_copy = list(dices)
+        dice_used = game.dice_used(move, dices_copy)
+        dices_copy.remove(dice_used)
+        new_game = game.play(len(dices_copy) > 0, move)
+        evaluate = minimax(new_game, game.turn(), dices_copy, maximum_depth)
+        print(f"evaluate: {evaluate}")
         if evaluate > best_value:
             best_value = evaluate
-            best_move = next_game
+            best_move = move
     return best_move
 
 def best_move_agent_poda(game, dices, maximum_depth = 3):
@@ -61,12 +107,11 @@ def best_move_agent_poda(game, dices, maximum_depth = 3):
 
     for move in game.valid_moves(game.turn(), dices):
         dices_copy = list(dices)
-        dice_used = game.dice_used(move)
-        #print(dices_copy, dice_used)
+        dice_used = game.dice_used(move, dices_copy)
         dices_copy.remove(dice_used)
         new_game = game.play(len(dices_copy) > 0, move)
         evaluate = minimax_alfabeta(new_game, game.turn(), dices_copy, maximum_depth)
-        #print(f"evaluate: {evaluate}")
+        print(f"evaluate: {evaluate}")
         if evaluate > best_value:
             best_value = evaluate
             best_move = move
@@ -146,18 +191,21 @@ def first_moves(game, dices, player):
 
 if __name__ == "__main__":
     game = Backgammon()
-    game.board =  [
-            (1, 2),                                                             # 0: bar (whites, blacks)
-            (2, Checkers.WHITE), (1, Checkers.WHITE), None, None, None, (5, Checkers.BLACK),   # 1-6: Black's home board
-            None, (3, Checkers.BLACK), None, None, None, (5, Checkers.WHITE),   # 7-12: Outer Board
-            (5, Checkers.BLACK), None, None, None, (3, Checkers.WHITE), None,   # 13-18: Outer Board
-            (5, Checkers.WHITE), None, None, None, None, (2, Checkers.BLACK),   # 19-24: White's home board
-            (0, 0)                                                              # 25: bear off (whites, blacks)
-        ]
+    # game.board = [
+    #         (0, 1),                                                             # 0: bar (whites, blacks)
+    #         (3, Checkers.BLACK), (4, Checkers.BLACK), (1, Checkers.BLACK), (1, Checkers.BLACK), None, None,   # 1-6: Black's home board
+    #         None, None, None, None, None, None,   # 7-12: Outer Board
+    #         None, None, None, None, None, None,   # 13-18: Outer Board
+    #         (2, Checkers.BLACK), (6, Checkers.WHITE), (3, Checkers.WHITE), (4, Checkers.WHITE), (2, Checkers.WHITE), (3, Checkers.BLACK),   # 19-24: White's home board
+    #         (0, 0)                                                              # 25: bear off (whites, blacks)
+    #     ]
     print(game)
-    print(game.evaluate(game.turn()))
+    
     dices = game.start()
-    print(dices)
+    
+    print(game.turn())
+    print(game.evaluate(game.turn()))
+    dices = [6, 5]
     print(game.valid_moves(game.turn(), dices))
     #print(first_move(game, dices, game.turn))
-    print(best_move_agent_poda(game, dices, 5))
+    print(best_move_agent(game, dices, 5))
