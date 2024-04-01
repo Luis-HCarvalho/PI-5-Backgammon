@@ -28,8 +28,13 @@ class Human():
 
                     if (self.checker == Checkers.WHITE):
                         current_move = (position, position + dice)
+                        out_board = position + dice > 25
                     else:
                         current_move = (position, position - dice)
+                        out_board = position - dice < 1
+
+                    if out_board:
+                        current_move = (position, 25)
 
                 dices.remove(dice)
                 backgammon = backgammon.play(len(dices) > 0, current_move)
@@ -51,9 +56,10 @@ class MiniMax():
     def turn(self, backgammon, dices):
         dices = backgammon.dices() if len(dices) == 0 else dices
         print(dices)
+        # print(backgammon.valid_moves(self.checker, dices))
         while len(dices) >= 1:
             move = best_move_agent_poda(backgammon, dices, 6)
-            
+         
             if move == [-1, -1]:
                 backgammon = backgammon.skip_turn(backgammon)
                 break
@@ -69,6 +75,7 @@ class MiniMax():
         print(dices)
         
         return first_moves(backgammon, dices, self.checker)
+    
 
 if __name__ == "__main__":
     backgammon_board = Backgammon()
