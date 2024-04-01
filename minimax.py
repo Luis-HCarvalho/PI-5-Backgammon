@@ -70,7 +70,7 @@ def best_move_agent_poda(game, dices, maximum_depth = 3):
     for next_game in game.valid_moves(game.turn(), dices):
         dices_copy = list(dices)
         dice_used = game.dice_used(next_game)
-        print(dices_copy, dice_used)
+        #print(dices_copy, dice_used)
         dices_copy.remove(dice_used)
         new_game = game.play(len(dices_copy) > 0, next_game)
         evaluate = minimax_alfabeta(new_game, game.turn(), dices_copy, maximum_depth)
@@ -151,9 +151,18 @@ def first_moves(game, dices, player):
 
 if __name__ == "__main__":
     game = Backgammon()
+    game.board =  [
+            (1, 2),                                                             # 0: bar (whites, blacks)
+            (2, Checkers.WHITE), (1, Checkers.WHITE), None, None, None, (5, Checkers.BLACK),   # 1-6: Black's home board
+            None, (3, Checkers.BLACK), None, None, None, (5, Checkers.WHITE),   # 7-12: Outer Board
+            (5, Checkers.BLACK), None, None, None, (3, Checkers.WHITE), None,   # 13-18: Outer Board
+            (5, Checkers.WHITE), None, None, None, None, (2, Checkers.BLACK),   # 19-24: White's home board
+            (0, 0)                                                              # 25: bear off (whites, blacks)
+        ]
     print(game)
     print(game.evaluate(game.turn()))
-    dices = game.dices()
+    dices = game.start()
     print(dices)
+    print(game.valid_moves(game.turn(), dices))
     #print(first_move(game, dices, game.turn))
-    print(best_move_agent_poda(game, dices, 8))
+    print(best_move_agent_poda(game, dices, 3))
