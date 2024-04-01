@@ -345,3 +345,14 @@ class Backgammon(Game):
 
         turn = (self.turn() if dices_left else self.turn(next=True))
         return Backgammon(board, turn)
+    
+    # receives a tuple that corresponds to the moviment made by a checker, 
+    # i.e. (origin position, target position), and return the dice value used
+    # that make this movement possible
+    def dice_used(movement):
+        if (movement[0] == 0 and movement[1] >= 19):  # black checkers player moving checkers out of the bar
+            used_dice = abs(movement[1] - 24) + 1
+        else:
+            used_dice = abs(movement[1] - movement[0])
+        
+        return used_dice

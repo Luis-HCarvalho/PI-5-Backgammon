@@ -45,12 +45,8 @@ class MiniMax():
         while len(dices) >= 1:
             move = best_move_agent_poda(backgammon, dices, 6)
             
-            used_dice = abs(move[1] - move[0])
-            
-            if used_dice == 24:
-                used_dice = 24 - used_dice + 1
-
-            dices.remove(used_dice)
+            dice_used = backgammon.dice_used(move)
+            dices.remove(dice_used)
             backgammon = backgammon.play(len(dices) > 0, move)
         
         return backgammon

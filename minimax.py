@@ -30,13 +30,10 @@ def minimax_alfabeta(game, player, rolled_dices, maximum_depth = 3, alfa = float
     if game.turn() == player: 
         for dices in dices_combinations:
             for next_game in game.valid_moves(player, dices):
-                used_dice = abs(next_game[1] - next_game[0])
                 dices_copy = list(dices)
-                
-                if used_dice == 24:
-                    used_dice = 24 - used_dice + 1
-                
-                dices_copy.remove(used_dice)
+                dice_used = game.dice_used(next_game)
+                dices_copy.remove(dice_used)
+
                 new_game = game.play(len(dices_copy) > 0, next_game)
                 evaluate = evaluate = minimax_alfabeta(new_game, player, dices_copy, maximum_depth - 1, alfa, beta)
                 alfa = max(evaluate, alfa)
@@ -46,13 +43,10 @@ def minimax_alfabeta(game, player, rolled_dices, maximum_depth = 3, alfa = float
     else:
         for dices in dices_combinations:
             for next_game in game.valid_moves(player, dices):
-                used_dice = abs(next_game[1] - next_game[0])
                 dices_copy = list(dices)
-
-                if used_dice == 24:
-                    used_dice = 24 - used_dice + 1
+                dice_used = game.dice_used(next_game)
+                dices_copy.remove(dice_used)
                 
-                dices_copy.remove(used_dice)
                 new_game = game.play(len(dices_copy) > 0, next_game)
                 evaluate = minimax_alfabeta(new_game, player, dices_copy, maximum_depth - 1, alfa, beta)
                 beta = min(evaluate, beta)
@@ -75,14 +69,9 @@ def best_move_agent_poda(game, dices, maximum_depth = 3):
     best_move = [-1, -1]
     for next_game in game.valid_moves(game.turn(), dices):
         dices_copy = list(dices)
-        
-        if (next_game[0] == 0 and next_game[1] >= 19):  # black checkers player moving checkers out of the bar
-            used_dice = abs(next_game[1] - 24) + 1
-        else:
-            used_dice = abs(next_game[1] - next_game[0])
-        
-        print(dices_copy, used_dice)
-        dices_copy.remove(used_dice)
+        dice_used = game.dice_used(next_game)
+        print(dices_copy, dice_used)
+        dices_copy.remove(dice_used)
         new_game = game.play(len(dices_copy) > 0, next_game)
         evaluate = minimax_alfabeta(new_game, game.turn(), dices_copy, maximum_depth)
         if evaluate > best_value:
