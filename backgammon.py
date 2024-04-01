@@ -106,7 +106,7 @@ class Backgammon(Game):
                 new_position = position - movement
 
             if (self._available_position(checker, new_position)):
-                moves.append((0, new_position))
+                moves = self.add_item(moves, (0, new_position))
 
         return moves
     
@@ -124,7 +124,7 @@ class Backgammon(Game):
                     new_position = position - movement
 
                 if(self._available_position(checker, new_position)):
-                    moves.append((position, new_position))
+                    moves = self.add_item(moves, (position, new_position))
         
         return moves
     
@@ -141,27 +141,29 @@ class Backgammon(Game):
                 if (checker == Checkers.WHITE):
                     new_position = position + movement
                     if (new_position == self.board_number_of_positions + 1):
-                        moves_with_score.append((position, 25))
-                        moves.append((position, 25))
+                        moves_with_score = self.add_item(moves_with_score, (position, 25))
+                        moves = self.add_item(moves, (position, 25))
                     elif (new_position < self.board_number_of_positions + 1):
-                        moves.append((position, new_position))
+                        if(self._available_position(checker, new_position)):
+                            moves = self.add_item(moves, (position, new_position))
                     else:
-                        moves_out_range.append(position)
+                        moves_out_range = self.add_item(moves_out_range, position)
                 else:
                     new_position = position - movement
                     if (new_position == 0):
-                        moves_with_score.append((position, 25))
-                        moves.append((position, 25))
+                        moves_with_score = self.add_item(moves_with_score, (position, 25))
+                        moves = self.add_item(moves, (position, 25))
                     elif (new_position > 0):
-                        moves.append((position, new_position))
+                        if(self._available_position(checker, new_position)):
+                            moves = self.add_item(moves, (position, new_position))
                     else:
-                        moves_out_range.append(position)
+                        moves_out_range = self.add_item(moves_out_range, position)
 
             if (moves_with_score == [] and moves_out_range != []):
                 if (checker == Checkers.WHITE):
-                    moves.append((min(moves_out_range), 25))
+                    moves = self.add_item(moves, (min(moves_out_range), 25))
                 else:
-                    moves.append((max(moves_out_range), 25))
+                    moves = self.add_item(moves, (max(moves_out_range), 25))
             
             moves_out_range = []
             moves_with_score = [] 
@@ -357,8 +359,16 @@ class Backgammon(Game):
         
         return used_dice
     
+    #
     def skip_turn(self, backgammon):
         board = backgammon.board[:]
         turn = backgammon.turn(next=True)
 
         return Backgammon(board, turn)
+    
+    #
+    def add_item(self, list, new_item):
+        if (new_item not in list):
+            list.append(new_item)
+        
+        return list
