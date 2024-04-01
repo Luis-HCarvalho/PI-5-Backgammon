@@ -10,7 +10,6 @@ class Human():
 
         turns = range(len(dices))
 
-        moves = []
         for turn in turns: 
             current_move = (-1, -1)
             # print(backgammon.valid_moves(self.checker, dices))
@@ -32,7 +31,6 @@ class Human():
 
             dices.remove(dice)
             backgammon = backgammon.play(len(dices) > 0, current_move)
-            moves.append(current_move)
             print(backgammon)
 
         return backgammon
