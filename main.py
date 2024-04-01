@@ -12,26 +12,35 @@ class Human():
 
         for turn in turns: 
             current_move = (-1, -1)
+            valid_moves = backgammon.valid_moves(self.checker, dices)
             # print(backgammon.valid_moves(self.checker, dices))
 
-            while current_move not in backgammon.valid_moves(self.checker, dices):
+            if (valid_moves != []):
+                while current_move not in valid_moves:
+                    print("\nValores dos dados: ")
+                    for dice in dices:
+                        print(dice)
+
+                    print(f"\n{turn + 1}º Jogada do humano")
+
+                    position = int(input("Posição da peça a ser movida: "))
+                    dice = int(input("Valor do dado para movimentação: "))
+
+                    if (self.checker == Checkers.WHITE):
+                        current_move = (position, position + dice)
+                    else:
+                        current_move = (position, position - dice)
+
+                dices.remove(dice)
+                backgammon = backgammon.play(len(dices) > 0, current_move)
+                print(backgammon)
+            else:
                 print("\nValores dos dados: ")
                 for dice in dices:
                     print(dice)
 
-                print(f"\n{turn + 1}º Jogada do humano")
-
-                position = int(input("Posição da peça a ser movida: "))
-                dice = int(input("Valor do dado para movimentação: "))
-
-                if (self.checker == Checkers.WHITE):
-                    current_move = (position, position + dice)
-                else:
-                    current_move = (position, position - dice)
-
-            dices.remove(dice)
-            backgammon = backgammon.play(len(dices) > 0, current_move)
-            print(backgammon)
+                print("\nSem jogadas válidas, pular turno")
+                backgammon = backgammon.skip_turn(backgammon)
 
         return backgammon
 

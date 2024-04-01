@@ -105,7 +105,8 @@ class Backgammon(Game):
                 position = 25
                 new_position = position - movement
 
-            moves.append((0, new_position))
+            if (self._available_position(checker, new_position)):
+                moves.append((0, new_position))
 
         return moves
     
@@ -355,3 +356,9 @@ class Backgammon(Game):
             used_dice = abs(movement[1] - movement[0])
         
         return used_dice
+    
+    def skip_turn(self, backgammon):
+        board = backgammon.board[:]
+        turn = backgammon.turn(next=True)
+
+        return Backgammon(board, turn)
