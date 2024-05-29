@@ -52,7 +52,7 @@ class Learning:
     def _reward(self, state):
         return (1 if state[-1][self.player_color] == 15 else 0)
     
-    def td_zero_update(self, reward, state, next_state, a, y):
+    def td_zero_update(self, state, next_state, a=0.1, y=1):
         """
         a: learning rate
         y: discount_factor
