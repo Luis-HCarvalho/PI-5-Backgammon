@@ -43,6 +43,9 @@ class Learning:
 
         return model
     
+    def save_model(self):
+        self.model.save("backgammon_model.h5")
+    
     def _predict_value(self, state):
         return self.model.predict(state)
     
