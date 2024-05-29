@@ -31,12 +31,15 @@ class Learning:
         return arr
 
     def _build_model(self):
-        model = Sequential([
-            layers.Dense(128, activation="relu", input_shape=(self.state_size)),
-            layers.Dense(128, activation="relu"),
-            layers.Dense(1, activation="linear")
-        ])
-        model.compile(optimizer=keras.optimizers.Adam(), loss="mse")
+        try:
+            model = keras.models.load_model("backgammon_model.h5")
+        except:
+            model = Sequential([
+                layers.Dense(128, activation="relu", input_shape=(self.state_size)),
+                layers.Dense(128, activation="relu"),
+                layers.Dense(1, activation="linear")
+            ])
+            model.compile(optimizer=keras.optimizers.Adam(), loss="mse")
 
         return model
     
