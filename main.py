@@ -94,7 +94,7 @@ class Bot():
             best = (None, float("-inf"))
             for m in mvs:
                 new_state = backgammon.play(True, m)
-                t = self.learning.td_zero_update(backgammon.board, new_state)
+                t = self.learning.td_zero_update(backgammon.board, new_state.board)
                 if t > best[1]:
                     best = (m, t)
 
@@ -108,7 +108,7 @@ class Bot():
             dices.remove(dice_used)
             backgammon = backgammon.play(len(dices) > 0, move)
         
-        if backgammon.win():
+        if backgammon.won():
             self.learning.save_model()
 
         return backgammon
@@ -152,10 +152,15 @@ if __name__ == "__main__":
     while not backgammon_board.won():
         print(backgammon_board)
         player_turn = backgammon_board.turn()
+        print(f"player turn: {player_turn}")
         if player_turn == player1.checker:
-            backgammon_board = player1.turn(backgammon_board, first_dices)        
+            backgammon_board = player1.turn(backgammon_board, first_dices)
+            print(">>>")
+            print(type(backgammon_board))   
         else:
             backgammon_board = player2.turn(backgammon_board, first_dices)
+            print(">>>")
+            print(type(backgammon_board))
 
         first_dices = []
         if player_turn != backgammon_board.turn():
