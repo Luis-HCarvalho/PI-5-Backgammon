@@ -51,3 +51,20 @@ class Learning:
     
     def _reward(self, state):
         return (1 if state[-1][self.player_color] == 15 else 0)
+    
+    def td_zero_update(self, reward, state, next_state, a, y):
+        """
+        a: learning rate
+        y: discount_factor
+        """
+        reward = self._reward(state)
+        state = self._vectorize_state(state)
+        next_state = self._vectorize_state(next_state)
+        s_val = self._predict_value(state)
+        ns_val = self._predict_value(next_state)
+
+        # target = reward + discount_factor * self._predict_value(next_state_val)
+        target = s_val + a * (reward + y * self._predict_value(ns_val) - s_val)
+        self._train(state, target)
+
+        return target
