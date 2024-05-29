@@ -1,19 +1,20 @@
 import numpy as np
+import keras 
 from keras import Sequential, layers
 from backgammon import Checkers
 
 class Learning:
-    def __init__(self, game, player_color):
-        state = self._vectorize_state(game.board)
+    def __init__(self, board, player_color):
+        state = self._vectorize_state(board)
         self.state_size = len(state)
-        self.player_color = player_color
+        self.player_color = (0 if player_color == Checkers.WHITE else 1)
         self.model = self._build_model()
 
 
     def _vectorize_state(self, state):
         # len(state) is 26
         arr = np.zeros(28, dtype=int)
-        
+
         arr[0] = state[0][0]  #bar whites
         arr[1] = state[0][1]  #bar blacks
 
@@ -35,7 +36,8 @@ class Learning:
             model = keras.models.load_model("backgammon_model.h5")
         except:
             model = Sequential([
-                layers.Dense(128, activation="relu", input_shape=(self.state_size)),
+                keras.Input(shape=(28,)),
+                layers.Dense(128, activation="relu", name="InputLayer"),
                 layers.Dense(128, activation="relu"),
                 layers.Dense(1, activation="linear")
             ])
@@ -47,9 +49,12 @@ class Learning:
         self.model.save("backgammon_model.h5")
     
     def _predict_value(self, state):
+        state = np.expand_dims(state, axis=0)
         return self.model.predict(state)
     
     def _train(self, state, target):
+        state = np.expand_dims(state, axis=0)
+        target = np.expand_dims(target, axis=0)
         self.model.fit(state, target, epochs=1, verbose=0)
     
     def _reward(self, state):
@@ -67,7 +72,7 @@ class Learning:
         ns_val = self._predict_value(next_state)
 
         # target = reward + discount_factor * self._predict_value(next_state_val)
-        target = s_val + a * (reward + y * self._predict_value(ns_val) - s_val)
+        target = s_val + a * (reward + y * ns_val - s_val)
         self._train(state, target)
 
         return target
