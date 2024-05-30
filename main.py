@@ -98,7 +98,7 @@ class Bot():
                 if t > best[1]:
                     best = (m, t)
 
-            move = best[0]
+            move = (best[0] if len(mvs) > 0 else [-1, -1])
          
             if move == [-1, -1]:
                 backgammon = backgammon.skip_turn(backgammon)
@@ -154,13 +154,9 @@ if __name__ == "__main__":
         player_turn = backgammon_board.turn()
         print(f"player turn: {player_turn}")
         if player_turn == player1.checker:
-            backgammon_board = player1.turn(backgammon_board, first_dices)
-            print(">>>")
-            print(type(backgammon_board))   
+            backgammon_board = player1.turn(backgammon_board, first_dices) 
         else:
             backgammon_board = player2.turn(backgammon_board, first_dices)
-            print(">>>")
-            print(type(backgammon_board))
 
         first_dices = []
         if player_turn != backgammon_board.turn():
