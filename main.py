@@ -113,6 +113,34 @@ class Bot():
 
         return backgammon
 
+def play_n_episodes(n):
+    def train():
+        backgammon_board = Backgammon()
+
+        player1 = Bot(Checkers.WHITE)
+        player2 = Bot(Checkers.BLACK)
+
+        first_dices = backgammon_board.start()
+        turno = 1
+
+        while not backgammon_board.won():
+            # print(backgammon_board)
+            player_turn = backgammon_board.turn()
+            # print(f"player turn: {player_turn}")
+            if player_turn == player1.checker:
+                backgammon_board = player1.turn(backgammon_board, first_dices) 
+            else:
+                backgammon_board = player2.turn(backgammon_board, first_dices)
+
+            first_dices = []
+            if player_turn != backgammon_board.turn():
+                turno += 1
+        
+        # print(f"{backgammon_board.turn()} ganhou!")
+    count = 0
+    while count < n:
+        train()
+        count += 1
 
 if __name__ == "__main__":
     backgammon_board = Backgammon()
