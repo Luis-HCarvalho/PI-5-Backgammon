@@ -68,8 +68,8 @@ class Learning:
         reward = self._reward(state)
         state = self._vectorize_state(state)
         next_state = self._vectorize_state(next_state)
-        s_val = self._predict_value(state)
-        ns_val = self._predict_value(next_state)
+        s_val = self._predict_value(state)[0][0]
+        ns_val = self._predict_value(next_state)[0][0]
 
         # target = reward + discount_factor * self._predict_value(next_state_val)
         target = s_val + a * (reward + y * ns_val - s_val)
