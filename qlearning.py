@@ -69,7 +69,7 @@ class Qlearning:
                 
                 next_game = game.play(len(dices) > 0, move)
                 
-                q_next = self.new_q(next_game, dices)
+                q_next = self.new_q(game, next_game, dices)
                 # aqui acontece a atualização do Q(s,a)
                 self.Q[key] += self.alpha * (q_next -  q_last)
                 
@@ -95,7 +95,7 @@ class Qlearning:
             
             next_game = game.play(len(dices_copy) > 0, move)
             
-            q_next = self.new_q(next_game, dices)
+            q_next = self.new_q(game, next_game, dices)
             # Q(s,a) <= Q(s,a) + α([ R(s,a,s') +  𝛾 max(a) Q(s',a') - Q(s,a)] )
             self.Q[key] += self.alpha * (q_next -  q_last)
 
@@ -106,16 +106,21 @@ class Qlearning:
                 for new_dices in possible_dices:
                     self.update(next_game, new_dices, depth + 1)
 
-    def new_q(self, next_game, dices):
+    def new_q(self, game, next_game, dices):
         max_a = self.get_max_a(next_game, dices)[0] # max(a) Q(s',a')
-        return next_game.evaluate(self.player) + self.discount * max_a
+        return game.evaluate(game.turn()) + self.discount * max_a
 
     def get_max_a(self, game, dices):
         max_q = float("-inf")
         best_move = [-1, -1]
         player = game.turn()
-        if len(dices) > 0:
-            valid_moves = game.valid_moves(player, dices)
+        dices_copy = [list(dices)]
+        
+        if len(dices) == 0:
+            dices_copy = [[x, y] if x != y else [x, y] * 2 for x in range(1, 7) for y in range(x, 7)]        
+
+        for new_dices in dices_copy:
+            valid_moves = game.valid_moves(player, new_dices)
             for move in valid_moves:
                 key = (tuple(game.board), tuple(move))
                 if (not key in self.Q):
@@ -124,17 +129,6 @@ class Qlearning:
                 if max_q < self.Q[key]:
                     max_q = self.Q[key]
                     best_move = move
-        else:
-            possible_dices = [[x, y] if x != y else [x, y] * 2 for x in range(1, 7) for y in range(x, 7)]
-            for new_dices in possible_dices:
-                valid_moves = game.valid_moves(player.opposite(), new_dices)
-                for move in valid_moves:
-                    key = (tuple(game.board), tuple(move))
-                    if (not key in self.Q):
-                        self.Q[key] = 0.0
-                        
-                    if max_q < self.Q[key]:
-                        max_q = self.Q[key]
         
         return (max_q, best_move)
     
@@ -146,21 +140,21 @@ class Qlearning:
 
 if __name__ == "__main__":
     def train(times = 10):
-        qlearning = Qlearning(table_name="start-table.pkl", load=True)
+        qlearning = Qlearning(table_name="start-table5.pkl", load=True)
     
         i = 0
         
         while i < times:
             print(i)
-            qlearning.calc_all_states()
-            # qlearning.calc()
+            #qlearning.calc_all_states()
+            qlearning.calc(3)
             
             i += 1
         
         qlearning.save()
         
     def get_bests():
-        qlearning = Qlearning(table_name="start-table.pkl")
+        qlearning = Qlearning(table_name="start-table5.pkl")
 
         possible_dices = [[x, y] for x in range(1, 7) for y in range(x + 1, 7)]
         
