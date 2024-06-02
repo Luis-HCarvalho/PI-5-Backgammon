@@ -14,7 +14,7 @@ class Human():
         for turn in turns: 
             current_move = (-1, -1)
             valid_moves = backgammon.valid_moves(self.checker, dices)
-            # print(backgammon.valid_moves(self.checker, dices))
+            print(backgammon.valid_moves(self.checker, dices))
 
             if (valid_moves != []):
                 while current_move not in valid_moves:
@@ -47,6 +47,7 @@ class Human():
 
                 print("\nSem jogadas válidas, pular turno")
                 backgammon = backgammon.skip_turn(backgammon)
+                break
 
         return backgammon
 
@@ -58,7 +59,7 @@ class MiniMax():
         dices = backgammon.dices() if len(dices) == 0 else dices
         print(dices)
         # print(backgammon.valid_moves(self.checker, dices))
-        while len(dices) >= 1:
+        while len(dices) >= 1 and not backgammon.won():
             move = best_move_agent_poda(backgammon, dices, 4)
          
             if move == [-1, -1]:
@@ -143,6 +144,7 @@ def play_n_episodes(n):
         count += 1
 
 if __name__ == "__main__":
+    
     backgammon_board = Backgammon()
 
     # human = Human(Checkers.WHITE)

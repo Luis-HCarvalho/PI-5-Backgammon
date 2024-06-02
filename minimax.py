@@ -101,17 +101,23 @@ def best_move_agent(game, dices, maximum_depth = 8):
             best_move = move
     return best_move
 
-def best_move_agent_poda(game, dices, maximum_depth = 3):
+def best_move_agent_poda(game, dices, maximum_depth = 5):
     best_value = float("-inf")
+    
+    valid_moves = game.valid_moves(game.turn(), dices)
+    
     best_move = [-1, -1]
+    
+    if valid_moves != []:
+        best_move = valid_moves[0]    
 
-    for move in game.valid_moves(game.turn(), dices):
+    for move in valid_moves:
         dices_copy = list(dices)
         dice_used = game.dice_used(move, dices_copy)
         dices_copy.remove(dice_used)
         new_game = game.play(len(dices_copy) > 0, move)
         evaluate = minimax_alfabeta(new_game, game.turn(), dices_copy, maximum_depth)
-        print(f"evaluate: {evaluate}")
+        #print(f"evaluate: {evaluate}")
         if evaluate > best_value:
             best_value = evaluate
             best_move = move

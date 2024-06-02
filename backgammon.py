@@ -66,7 +66,7 @@ class Backgammon(Game):
             if board_pos is not None:
                 distance_multiplier = 1
 
-                if board_pos[1] == Checkers.BLACK:
+                if board_pos[1] == Checkers.WHITE:
                     distance_multiplier = self.board_number_of_positions - position + 1
                 else:
                     distance_multiplier = position
@@ -76,7 +76,7 @@ class Backgammon(Game):
                 else:
                     value += board_pos[0] * distance_multiplier
 
-        if player == Checkers.WHITE:
+        if player == Checkers.BLACK:
             value -= self.board[0][1] * 25
             value += self.board[0][0] * 25
         else:
