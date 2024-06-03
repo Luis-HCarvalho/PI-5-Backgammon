@@ -1,6 +1,7 @@
 from enum import Enum
 from game import Game, Player
 import random
+import pygame
 
 class Checkers(Player, Enum):
     WHITE = 0
@@ -212,7 +213,7 @@ class Backgammon(Game):
 
     # organize visual presentation of each quadrant   
     def quadrant_checkers_positions(self, total_of_quadrant_columns, total_of_rows, start, end):
-        quadrant_positions = [" 🟦 |"] * (total_of_quadrant_columns * total_of_rows)
+        quadrant_positions = [" 🟦 "] * (total_of_quadrant_columns * total_of_rows)
 
         for position in range(start - 1, end):
             index = position - start + 1
@@ -221,9 +222,9 @@ class Backgammon(Game):
 
             if (position_value != None):
                 if (position_value[1] == Checkers.WHITE):
-                    checker = " ⚪ |"
+                    checker = " ⚪ "
                 else:
-                    checker = " ⚫ |"
+                    checker = " ⚫ "
 
                 # if the number of checkers is less than the set number of lines, normally add the representation to the list
                 if (position_value[0] <= total_of_rows):   
@@ -386,3 +387,105 @@ class Backgammon(Game):
             list.append(new_item)
         
         return list
+    
+    def draw_board(self, window):
+        # variables for readability and maintenance of base values ​​used
+        total_of_rows = 7
+        total_of_quadrant_columns = int(self.board_number_of_positions / 4)
+        total_of_positions = self.board_number_of_positions * total_of_rows
+        total_of_positions_top = total_of_positions_bottom = int(total_of_positions / 2)
+
+        # lists of quadrant presentations being divided by the top of the board and the bottom
+        positions_top = []
+        positions_bottom = []
+
+        positions_top.append(self.quadrant_checkers_positions(total_of_quadrant_columns, total_of_rows, 13, 18))
+        positions_top.append(self.quadrant_checkers_positions(total_of_quadrant_columns, total_of_rows, 19, 24))
+        
+        # as the board is mirrored between the top and bottom,the bottom part was inverted to achieve this effect
+        positions_bottom.append(self.quadrant_checkers_positions(total_of_quadrant_columns, total_of_rows, 7, 12)[::-1])
+        positions_bottom.append(self.quadrant_checkers_positions(total_of_quadrant_columns, total_of_rows, 1, 6)[::-1])
+    
+        board_top = [None] * total_of_positions_top
+        board_bottom = [None] * total_of_positions_bottom
+        
+        # merging the quadrants into a single list, for this purpose manipulating the indexes so that when placing them in the output, they maintain the correct order
+        for column in range(total_of_quadrant_columns):
+            for row in range(total_of_rows):
+                board_top[column + (2 * total_of_quadrant_columns * row)] = positions_top[0][total_of_quadrant_columns * row + column]
+                board_top[column + (2 * total_of_quadrant_columns * row) + total_of_quadrant_columns] = positions_top[1][total_of_quadrant_columns * row + column]
+
+                board_bottom[column + (12 * row)] = positions_bottom[0][6*row + column]
+                board_bottom[column + (12 * row)+6] = positions_bottom[1][6*row + column]
+
+        background = (198, 195, 191)
+        checker_white = (255, 255, 255)
+        checker_black = (0, 0, 0)
+
+        width, height = 800, 1000
+        rows, cols = 14, 12
+        cell_size = width // cols
+        checker_radius = cell_size // 2 - 5
+
+        position_number = 12
+        column = 0 
+        row = 0
+        for position in range(total_of_positions_top):
+            position_number += 1
+            if (position_number == 25):
+              position_number = 13
+            if (column == 12):
+                column = 0
+                row += 1
+            if (row == 8):
+                row == 0
+
+            rect = pygame.Rect(column * cell_size, row * cell_size, cell_size, cell_size)
+            pygame.draw.rect(window, (0, 0, 0), rect, 1)
+
+            if (board_top[position] == " ⚪ "):
+                pygame.draw.circle(window, checker_white, (column * cell_size + cell_size // 2, row * cell_size + cell_size // 2), checker_radius)
+            elif (board_top[position] == " ⚫ "):
+                pygame.draw.circle(window, checker_black, (column * cell_size + cell_size // 2, row * cell_size + cell_size // 2), checker_radius)
+              
+            column += 1
+        
+        position_number = 13
+        column = 0
+        row = 7
+        for position in range(total_of_positions_bottom):
+            position_number -= 1
+            if (position_number == 0):
+              position_number = 12
+            if (column == 12):
+                column = 0
+                row += 1
+            if (row == 13):
+                row == 7
+
+            rect = pygame.Rect(column * cell_size, row * cell_size, cell_size, cell_size)
+            pygame.draw.rect(window, (0, 0, 0), rect, 1)
+
+            if (board_bottom[position] == " ⚪ "):
+                pygame.draw.circle(window, checker_white, (column * cell_size + cell_size // 2, row * cell_size + cell_size // 2), checker_radius)
+            elif (board_bottom[position] == " ⚫ "):
+                pygame.draw.circle(window, checker_black, (column * cell_size + cell_size // 2, row * cell_size + cell_size // 2), checker_radius)
+              
+            column += 1
+
+        font = pygame.font.SysFont(None, 36)
+        text_y = 90
+        spacing = 90
+
+        pieces_captured_white = font.render(f"Peças brancas tomadas: {self.board[0][0]}", True, (0, 0, 0))
+        window.blit(pieces_captured_white, (width + 50, text_y))
+
+        pieces_captured_black = font.render(f"Peças pretas tomadas: {self.board[0][1]}", True, (0, 0, 0))
+        window.blit(pieces_captured_black, (width + 50, text_y + spacing))
+
+        pieces_scored_white = font.render(f"Peças brancas pontuadas: {self.board[25][0]}", True, (0, 0, 0))
+        window.blit(pieces_scored_white, (width + 50, text_y + 2 * spacing))
+
+        pieces_scored_black = font.render(f"Peças pretas pontuadas: {self.board[25][1]}", True, (0, 0, 0))
+        window.blit(pieces_scored_black, (width + 50, text_y + 3 * spacing))
+        
