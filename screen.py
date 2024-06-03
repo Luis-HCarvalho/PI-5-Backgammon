@@ -2,8 +2,6 @@ from backgammon import Backgammon, Checkers
 from minimax import best_move_agent_poda, first_moves
 from learning import Learning
 import pygame
-import threading
-import time
 
 class Human():
     def __init__(self, checker, window = None):
