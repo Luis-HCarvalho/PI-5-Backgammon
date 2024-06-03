@@ -352,7 +352,7 @@ class Backgammon(Game):
             else:
                 board[0] = (board[0][0] + 1, board[0][1])
 
-        turn = (self.turn() if dices_left else self.turn(next=True))
+        turn = (self.turn() if dices_left or not self.won() else self.turn(next=True))
         return Backgammon(board, turn)
     
     # receives a tuple that corresponds to the moviment made by a checker, 

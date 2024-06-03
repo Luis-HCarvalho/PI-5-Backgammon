@@ -14,7 +14,7 @@ class Human():
         for turn in turns: 
             current_move = (-1, -1)
             valid_moves = backgammon.valid_moves(self.checker, dices)
-            print(backgammon.valid_moves(self.checker, dices))
+            print(valid_moves)
 
             if (valid_moves != []):
                 while current_move not in valid_moves:
@@ -34,12 +34,15 @@ class Human():
                         current_move = (position, position - dice)
                         out_board = position - dice < 1
 
-                    if out_board:
+                    if out_board and dice in dices:
                         current_move = (position, 25)
 
                 dices.remove(dice)
                 backgammon = backgammon.play(len(dices) > 0, current_move)
                 print(backgammon)
+                
+                if backgammon.won():
+                    break
             else:
                 print("\nValores dos dados: ")
                 for dice in dices:
@@ -100,7 +103,7 @@ class Bot():
                     best = (m, t)
 
             move = (best[0] if len(mvs) > 0 else [-1, -1])
-         
+
             if move == [-1, -1]:
                 backgammon = backgammon.skip_turn(backgammon)
                 break
@@ -173,10 +176,17 @@ if __name__ == "__main__":
         return
     
     def usualGame():   
-        backgammon_board = Backgammon()
+        backgammon_board = Backgammon([
+            (0, 0),                                                             # 0: bar (whites, blacks)
+            (2, Checkers.BLACK), None, None, None, None, None,   # 1-6: Black's home board
+            None, None, None, None, None, None,   # 7-12: Outer Board
+            None, None, None, None, None, None,   # 13-18: Outer Board
+            (15, Checkers.WHITE), None, None, None, None, None,   # 19-24: White's home board
+            (0, 13)                                                              # 25: bear off (whites, blacks)
+        ])
 
-        human = Human(Checkers.WHITE)
-        minimax = MiniMax(Checkers.BLACK)
+        human = Human(Checkers.BLACK)
+        minimax = MiniMax(Checkers.WHITE)
 
         first_dices = backgammon_board.start()
 
