@@ -54,7 +54,7 @@ def minimax_alfabeta(game, player, rolled_dices, maximum_depth = 5, alfa = float
     if (len(rolled_dices) != 0):
         dices_combinations.append(rolled_dices)
     else:
-        dices_combinations = [[x, y] if x != y else [x, y] * 2 for x in range(1, 7) for y in range(1, 7)]
+        dices_combinations = [[x, y] if x != y else [x, y] * 2 for x in range(1, 7) for y in range(x, 7)]
 
     for dices in dices_combinations:
         if len(game.valid_moves(game.turn(), dices)) == 0:
