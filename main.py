@@ -1,6 +1,5 @@
 from backgammon import Backgammon, Checkers
 from minimax import best_move_agent_poda, first_moves
-from learning import Learning
 
 class Human():
     def __init__(self, checker):
@@ -33,6 +32,9 @@ class Human():
                     else:
                         current_move = (position, position - dice)
                         out_board = position - dice < 1
+                        if position == 0:
+                            current_move = (position, 25 - dice)
+                            out_board = False
 
                     if out_board and dice in dices:
                         current_move = (position, 25)
@@ -64,7 +66,7 @@ class MiniMax():
         # print(backgammon.valid_moves(self.checker, dices))
         while len(dices) >= 1 and not backgammon.won():
             move = best_move_agent_poda(backgammon, dices, 4)
-         
+        
             if move == [-1, -1]:
                 backgammon = backgammon.skip_turn(backgammon)
                 break
@@ -81,141 +83,37 @@ class MiniMax():
         
         return first_moves(backgammon, dices, self.checker)
 
-class Bot():
-    def __init__(self, checker):
-        self.checker = checker
-        self.learning = None
-    
-    def turn(self, backgammon, dices):
-        if self.learning == None:
-            self.learning = Learning(backgammon.board, backgammon.turn())
-
-        dices = backgammon.dices() if len(dices) == 0 else dices
-        print(dices)
-        # print(backgammon.valid_moves(self.checker, dices))
-        while len(dices) >= 1:
-            mvs = backgammon.valid_moves(backgammon.turn(), dices)
-            best = (None, float("-inf"))
-            for m in mvs:
-                new_state = backgammon.play(True, m)
-                t = self.learning.td_zero_update(backgammon.board, new_state.board)
-                if t > best[1]:
-                    best = (m, t)
-
-            move = (best[0] if len(mvs) > 0 else [-1, -1])
-
-            if move == [-1, -1]:
-                backgammon = backgammon.skip_turn(backgammon)
-                break
-
-            dice_used = backgammon.dice_used(move, dices)
-            dices.remove(dice_used)
-            backgammon = backgammon.play(len(dices) > 0, move)
-        
-        if backgammon.won():
-            self.learning.save_model()
-
-        return backgammon
-
-def play_n_episodes(n):
-    def train():
-        backgammon_board = Backgammon()
-
-        player1 = Bot(Checkers.WHITE)
-        player2 = Bot(Checkers.BLACK)
-
-        first_dices = backgammon_board.start()
-        turno = 1
-
-        while not backgammon_board.won():
-            # print(backgammon_board)
-            player_turn = backgammon_board.turn()
-            # print(f"player turn: {player_turn}")
-            if player_turn == player1.checker:
-                backgammon_board = player1.turn(backgammon_board, first_dices) 
-            else:
-                backgammon_board = player2.turn(backgammon_board, first_dices)
-
-            first_dices = []
-            if player_turn != backgammon_board.turn():
-                turno += 1
-        
-        # print(f"{backgammon_board.turn()} ganhou!")
-    count = 0
-    while count < n:
-        train()
-        count += 1
-
 if __name__ == "__main__":
-    def botGame():
-        backgammon_board = Backgammon()
+    backgammon_board = Backgammon()
 
-        player1 = Bot(Checkers.WHITE)
-        player2 = Bot(Checkers.BLACK)
+    human = Human(Checkers.BLACK)
+    minimax = MiniMax(Checkers.WHITE)
 
-        first_dices = backgammon_board.start()
+    first_dices = backgammon_board.start()
 
-        print("\n== GAMÃO ==\n")
+    print("\n== GAMÃO ==\n")
+    if (human.checker == Checkers.WHITE):
+        print("Humano ⚪")
+        print("Computador ⚫")
+    else:
+        print("Humano ⚫")
+        print("Computador ⚪")
 
-        turno = 1
-
-        while not backgammon_board.won():
-            print(backgammon_board)
-            player_turn = backgammon_board.turn()
-            print(f"player turn: {player_turn}")
-            if player_turn == player1.checker:
-                backgammon_board = player1.turn(backgammon_board, first_dices) 
-            else:
-                backgammon_board = player2.turn(backgammon_board, first_dices)
-
-            first_dices = []
-            if player_turn != backgammon_board.turn():
-                turno += 1
-        
-        print(f"{backgammon_board.turn()} ganhou!")
-        return
-    
-    def usualGame():   
-        backgammon_board = Backgammon([
-            (0, 0),                                                             # 0: bar (whites, blacks)
-            (2, Checkers.BLACK), None, None, None, None, None,   # 1-6: Black's home board
-            None, None, None, None, None, None,   # 7-12: Outer Board
-            None, None, None, None, None, None,   # 13-18: Outer Board
-            (15, Checkers.WHITE), None, None, None, None, None,   # 19-24: White's home board
-            (0, 13)                                                              # 25: bear off (whites, blacks)
-        ])
-
-        human = Human(Checkers.BLACK)
-        minimax = MiniMax(Checkers.WHITE)
-
-        first_dices = backgammon_board.start()
-
-        print("\n== GAMÃO ==\n")
-        if (human.checker == Checkers.WHITE):
-            print("Humano ⚪")
-            print("Computador ⚫")
+    turno = 1
+    while not backgammon_board.won():
+        print(backgammon_board)
+        turn_player = backgammon_board.turn()
+        if backgammon_board.turn() == human.checker:
+            backgammon_board = human.turn(backgammon_board, first_dices)        
+            # backgammon_board = backgammon_board.play(False, human.moves[-1])
+        elif turno == 1:
+            backgammon_board = minimax.first_turn(backgammon_board, first_dices)
         else:
-            print("Humano ⚫")
-            print("Computador ⚪")
+            backgammon_board = minimax.turn(backgammon_board, first_dices)
 
-        turno = 1
-        while not backgammon_board.won():
-            print(backgammon_board)
-            turn_player = backgammon_board.turn()
-            if backgammon_board.turn() == human.checker:
-                backgammon_board = human.turn(backgammon_board, first_dices)        
-                # backgammon_board = backgammon_board.play(False, human.moves[-1])
-            elif turno == 1:
-                backgammon_board = minimax.first_turn(backgammon_board, first_dices)
-            else:
-                backgammon_board = minimax.turn(backgammon_board, first_dices)
+        first_dices = []
+        if turn_player != backgammon_board.turn():
+            turno += 1
 
-            first_dices = []
-            if turn_player != backgammon_board.turn():
-                turno += 1
-
-        
-        print(f"{backgammon_board.turn()} ganhou!")
-        
-    usualGame()
-    # print(backgammon_board.valid_moves(Checkers.BLACK, (5, 6)))
+    print(backgammon_board)
+    print(f"{backgammon_board.turn()} ganhou!")
